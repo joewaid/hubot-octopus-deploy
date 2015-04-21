@@ -35,22 +35,22 @@ module.exports = (robot) ->
 
   robot.respond /help me deploy/i, (msg) ->
     commands = [
-      'hubot list projects',
-      'hubot show project <projectName>',
-      'hubot list <projectName> releases',
-      'hubot show <projectName> release <releaseVersion>',
-      'hubot list environments',
-      'hubot show environment <environmentName>',
-      'hubot list <projectName> recent deploys',
-      'hubot deploy <projectName> <releaseVersion> to <environmentName>',
-      'hubot deploy <projectName> latest to <environmentName>'
+      'hubot octo list projects',
+      'hubot octo show project <projectName>',
+      'hubot octo list <projectName> releases',
+      'hubot octo show <projectName> release <releaseVersion>',
+      'hubot octo list environments',
+      'hubot octo show environment <environmentName>',
+      'hubot octo list <projectName> recent deploys',
+      'hubot octo deploy <projectName> <releaseVersion> to <environmentName>',
+      'hubot octo deploy <projectName> latest to <environmentName>'
     ]
     msg.send "Ok, just use one of these commands:"
     message = ""
     message += helpText commands
     msg.send message
 
-  robot.respond /list (.*) recent deploys/i, (msg) ->
+  robot.respond /octo list (.*) recent deploys/i, (msg) ->
     projectName = msg.match[1]
     project = {}
     octo = new OctopusService()
@@ -72,7 +72,7 @@ module.exports = (robot) ->
             msg.send "Failed to retrieve environments. Status: #{status}"
     async.series flow
 
-  robot.respond /list (.*) releases/i, (msg) ->
+  robot.respond /octo list (.*) releases/i, (msg) ->
     projectName = msg.match[1]
     project = {}
     octo = new OctopusService()
@@ -94,7 +94,7 @@ module.exports = (robot) ->
             msg.send "Failed to retrieve environments. Status: #{status}"
     async.series flow
 
-  robot.respond /list projects/i, (msg) ->
+  robot.respond /octo list projects/i, (msg) ->
     new OctopusService().projects msg, (status, body, success) ->
       if success is true
         message = "Projects:\n\n"
@@ -103,7 +103,7 @@ module.exports = (robot) ->
       else
         msg.send "Failed to retrieve projects. Status: #{status}"
 
-  robot.respond /show project (.*)/i, (msg) ->
+  robot.respond /octo show project (.*)/i, (msg) ->
     name = msg.match[1]
     new OctopusService().project msg, name, (status, body, success) ->
       if not body
@@ -111,7 +111,7 @@ module.exports = (robot) ->
         return
       msg.send projectText body
 
-  robot.respond /list environments/i, (msg) ->
+  robot.respond /octo list environments/i, (msg) ->
     new OctopusService().environments msg, (status, body, success) ->
       if success is true
         message = "Environments:\n\n"
@@ -120,7 +120,7 @@ module.exports = (robot) ->
       else
         msg.send "Failed to retrieve environments. Status: #{status}"
 
-  robot.respond /show environment (.*)/i, (msg) ->
+  robot.respond /octo show environment (.*)/i, (msg) ->
     name = msg.match[1]
     new OctopusService().environment msg, name, (status, body, success) ->
       if not body
@@ -128,7 +128,7 @@ module.exports = (robot) ->
         return
       msg.send environmentText body
 
-  robot.respond /show (.*) release (.*)/i, (msg) ->
+  robot.respond /octo show (.*) release (.*)/i, (msg) ->
     projectName = msg.match[1]
     name = msg.match[2]
     project = {}
@@ -148,7 +148,7 @@ module.exports = (robot) ->
             return
           msg.send releaseText body
     async.series flow
-
+###
   robot.respond /deploy (.*) latest to (.*)/i, (msg) ->
     projectName = msg.match[1]
     environmentName = msg.match[2]
@@ -224,7 +224,7 @@ module.exports = (robot) ->
             else
               msg.send "There was an issue creating deployment. Status: #{status}. Response: #{body}"
       async.series flow
-
+###
 projectText = (env) ->
   return displayText { "Id": env.Id, "Name": env.Name }
 
@@ -320,7 +320,7 @@ class OctopusService
         callback res.statusCode, releases[0], true
       else
         callback res.statusCode, null, false
-
+###
   deploy: (msg, projectId, releaseId, environmentId, callback) ->
     data =
       projectId: projectId
@@ -331,7 +331,7 @@ class OctopusService
         callback res.statusCode, JSON.parse(body), true
       else
         callback res.statusCode, null, false
-
+###
   request: (msg) ->
     req = msg
       .http(@base_url)
